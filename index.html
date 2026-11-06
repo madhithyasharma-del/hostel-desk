@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14213D">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hostel Desk">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Hostel Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#EEF1F6; --surface:#FFFFFF; --ink:#14213D; --muted:#56637E; --line:#D9DFEA; --soft:#F5F7FB;
+  --money:#B86E00; --money-fill:#F2A33A;
+  --body:#0E7F72;  --body-fill:#2BB5A4;
+  --gym:#6B46C1;   --gym-fill:#8B6CE0;
+  --mood:#C73A62;  --mood-fill:#E8587F;
+  --warn:#C93C3C;  --good:#1D7F47; --info:#3B5BA9;
+  --radius-lg:22px; --radius-md:14px; --radius-sm:10px;
+}
+:root[data-theme="dark"] {
+  --bg:#0D1322; --surface:#162038; --ink:#E9EDF7; --muted:#9BA8C4; --line:#27324D; --soft:#1B2745;
+  --money:#F5B545; --money-fill:#F2A33A;
+  --body:#46CDBB;  --body-fill:#2BB5A4;
+  --gym:#B39DFF;   --gym-fill:#8B6CE0;
+  --mood:#FF86A6;  --mood-fill:#E8587F;
+  --warn:#FF7B7B;  --good:#5CD28E; --info:#8EA9F0;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "Bricolage Grotesque", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 16px; line-height: 1.45; font-variant-numeric: tabular-nums;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--info); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+header.top { max-width: 760px; margin: 0 auto; padding: 18px 16px 6px; display: flex; align-items: center; gap: 10px; }
+header.top h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+header.top .date { color: var(--muted); font-size: 14px; }
+header.top .grow { flex: 1; }
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); font-size: 18px; line-height: 1; }
+
+nav.nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(6, 1fr);
+  background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom);
+}
+nav.nav button { border: 0; background: none; padding: 9px 2px 8px; color: var(--muted); font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+nav.nav .ico { font-size: 20px; line-height: 1.1; }
+nav.nav button[aria-current="page"] { color: var(--ink); font-weight: 800; box-shadow: inset 0 3px 0 var(--ink); }
+@media (min-width: 760px) {
+  nav.nav { position: static; max-width: 760px; margin: 6px auto 10px; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  nav.nav button { flex-direction: row; justify-content: center; gap: 8px; font-size: 14px; padding: 10px; }
+  nav.nav button[aria-current="page"] { box-shadow: none; background: var(--ink); color: var(--bg); }
+  main { padding-bottom: 40px !important; }
+}
+main { max-width: 760px; margin: 0 auto; padding: 8px 16px 104px; }
+.tab > * + * { margin-top: 22px; }
+
+h2 { margin: 0 0 8px; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+.sub { color: var(--muted); font-size: 14px; margin: 0; }
+.row { display: flex; align-items: center; gap: 10px; }
+.between { justify-content: space-between; }
+.warn { color: var(--warn); } .good { color: var(--good); }
+
+/* hero */
+.hero { background: var(--ink); color: var(--bg); border-radius: var(--radius-lg); padding: 22px 20px 18px; }
+:root[data-theme="dark"] .hero { background: #1E2B4D; color: var(--ink); }
+.hero .label { margin: 0; font-size: 15px; opacity: .8; }
+.hero .num { font-size: clamp(54px, 17vw, 84px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; margin: 4px 0 6px; }
+.hero .num.over { color: #FF9A9A; }
+.hero .line { margin: 0; font-size: 14px; opacity: .85; }
+.rail { position: relative; height: 12px; border-radius: 99px; background: rgba(255,255,255,.18); margin: 18px 0 8px; }
+.rail .fill { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: var(--money-fill); }
+.rail .fill.over { background: #FF7B7B; }
+.rail .tick { position: absolute; top: -5px; bottom: -5px; width: 3px; border-radius: 2px; background: #fff; }
+.rail-legend { display: flex; justify-content: space-between; font-size: 13px; opacity: .85; }
+.pace { margin: 10px 0 0; font-size: 14px; font-weight: 600; }
+
+/* habit strip */
+.strip { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.strip > * { padding: 12px; border: 0; background: none; text-align: left; border-right: 1px solid var(--line); border-radius: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
+.strip > *:last-child { border-right: 0; }
+.strip .k { font-size: 13px; color: var(--muted); }
+.strip .v { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+.strip .s { font-size: 12px; color: var(--muted); }
+.strip .plus { margin-top: 6px; border: 1px solid var(--body); color: var(--body); background: none; border-radius: 99px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
+
+/* tips */
+.tips { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tips li { display: flex; gap: 10px; padding: 10px 12px; background: var(--surface); border-radius: var(--radius-sm); border-left: 4px solid var(--info); font-size: 15px; }
+.tips li.warn { border-left-color: var(--warn); color: var(--ink); }
+.tips li.good { border-left-color: var(--good); }
+.tips .ic { font-size: 18px; line-height: 1.3; }
+.nudge { display:block; width:100%; text-align:left; font:inherit; font-size:13px; color:var(--ink); background:var(--soft); border:1px dashed var(--line); border-radius:12px; padding:10px 12px; margin:0 0 12px; cursor:pointer; }
+.nudge[hidden] { display:none; }
+.note { font-size: 12px; color: var(--muted); margin: 8px 2px 0; }
+
+/* mood quick */
+.moods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.moods button { aspect-ratio: 1; max-height: 74px; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--surface); font-size: 30px; transition: transform .12s; }
+.moods button:active { transform: scale(.92); }
+
+/* forms */
+.form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: grid; gap: 12px; }
+.field { display: grid; gap: 4px; }
+.field > span { font-size: 13px; color: var(--muted); }
+input[type=text], input[type=number], input[type=date], input[list] {
+  width: 100%; padding: 11px 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--soft); min-height: 46px;
+}
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips input { position: absolute; opacity: 0; pointer-events: none; }
+.chips label { padding: 8px 14px; border-radius: 99px; border: 1px solid var(--line); background: var(--soft); font-size: 14px; cursor: pointer; }
+.chips input:checked + span, .chips label:has(input:checked) { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chips input:focus-visible + span { outline: 3px solid var(--info); }
+.btn { border: 0; border-radius: var(--radius-md); padding: 13px 16px; font-weight: 800; background: var(--ink); color: var(--bg); min-height: 48px; }
+.btn.money { background: var(--money-fill); color: #20160A; }
+.btn.body { background: var(--body-fill); color: #04231F; }
+.btn.gym { background: var(--gym-fill); color: #fff; }
+.btn.mood { background: var(--mood-fill); color: #fff; }
+.btn.ghost { background: none; border: 1px solid var(--line); color: var(--ink); font-weight: 600; }
+.btn.danger { background: none; border: 1px solid var(--warn); color: var(--warn); font-weight: 600; }
+.stepper { display: grid; grid-template-columns: 46px 1fr 46px; gap: 8px; align-items: center; }
+.stepper button { height: 46px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--soft); font-size: 22px; }
+.stepper input { text-align: center; font-size: 20px; font-weight: 800; }
+.glasses { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+.glasses i { width: 14px; height: 20px; border-radius: 2px 2px 5px 5px; border: 2px solid var(--body); }
+.glasses i.on { background: var(--body-fill); }
+
+/* charts */
+.chart { width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart .bar { fill: var(--c); opacity: .55; }
+.chart .bar.cur { opacity: 1; }
+.chart .goal { stroke: var(--muted); stroke-dasharray: 4 4; stroke-width: 1; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .axis { fill: var(--muted); font-size: 10px; }
+.chart .line { fill: none; stroke: var(--c); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.chart .dot { fill: var(--surface); stroke: var(--c); stroke-width: 2; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 14px 14px 10px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.facts div { padding: 10px 12px; border-radius: var(--radius-sm); background: var(--soft); }
+.facts b { display: block; font-size: 20px; letter-spacing: -0.02em; }
+.facts span { font-size: 12px; color: var(--muted); }
+
+/* category bars */
+.cats { display: grid; gap: 12px; }
+.cat .top { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 4px; }
+.cat .bar { position: relative; height: 10px; border-radius: 99px; background: var(--soft); }
+.cat .bar i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: var(--money-fill); }
+.cat .bar i.hot { background: var(--warn); }
+.cat .bar u { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+
+/* lists */
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.list .main { flex: 1; min-width: 0; }
+.list .main b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list .main small { color: var(--muted); font-size: 12px; }
+.list .amt { font-weight: 800; }
+.del { border: 0; background: none; font-size: 16px; padding: 8px; opacity: .6; border-radius: 8px; }
+.del:hover { opacity: 1; }
+.empty { padding: 18px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--radius-md); font-size: 15px; }
+
+.exlist { display: grid; gap: 8px; }
+.ex { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius-md); padding: 12px 14px; }
+.ex[aria-pressed="true"] { border-color: var(--gym); box-shadow: 0 0 0 2px var(--gym) inset; }
+.ex b { font-size: 16px; }
+.ex small { display: block; color: var(--muted); }
+
+/* toast + dialog */
+#toast { position: fixed; left: 50%; bottom: 84px; transform: translate(-50%, 20px); background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 99px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 30; max-width: 92vw; text-align: center; line-height: 1.3; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+#toast.pr { background: var(--gym-fill); color: #fff; }
+#toast.err { background: var(--warn); color: #fff; }
+dialog { border: 0; border-radius: var(--radius-lg); padding: 0; width: min(520px, 94vw); background: var(--surface); color: var(--ink); max-height: 92vh; }
+dialog::backdrop { background: rgba(8, 12, 24, .6); }
+dialog form { padding: 18px; display: grid; gap: 14px; }
+.catgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.catgrid label { display: grid; gap: 2px; font-size: 13px; color: var(--muted); }
+
+
+/* command bar */
+.cmd { max-width: 760px; margin: 4px auto 0; padding: 0 16px; }
+.cmd form { display: flex; gap: 8px; }
+.cmd input { flex: 1; min-width: 0; padding: 12px 16px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); min-height: 48px; font-size: 16px; }
+.cmd button { border: 0; border-radius: 99px; padding: 0 20px; font-weight: 800; background: var(--ink); color: var(--bg); min-height: 48px; }
+.cmd .hints { display: flex; gap: 6px; overflow-x: auto; padding: 8px 0 2px; scrollbar-width: none; }
+.cmd .hints::-webkit-scrollbar { display: none; }
+.cmd .hints button { flex: none; min-height: 0; padding: 5px 12px; font-size: 13px; font-weight: 600; background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
+
+/* score */
+.scorecard { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; align-items: center; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 14px 16px; }
+.scorecard .big { grid-row: span 2; font-size: 44px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.scorecard .big small { font-size: 15px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+.scorecard .lv { font-weight: 800; }
+.xp { height: 10px; border-radius: 99px; background: var(--soft); position: relative; overflow: hidden; }
+.xp i { position: absolute; inset: 0 auto 0 0; background: var(--gym-fill); border-radius: 99px; }
+.xp-note { font-size: 12px; color: var(--muted); }
+.parts { display: grid; gap: 12px; }
+.part .top { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 4px; }
+.part .top small { color: var(--muted); }
+.part .bar { height: 10px; border-radius: 99px; background: var(--soft); position: relative; overflow: hidden; }
+.part .bar i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: var(--body-fill); }
+.badges { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.badge { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); padding: 12px; display: grid; gap: 2px; }
+.badge .ic { font-size: 26px; line-height: 1.1; }
+.badge b { font-size: 15px; }
+.badge small { color: var(--muted); font-size: 12px; }
+.badge.locked { background: transparent; border-style: dashed; }
+.badge.locked .ic { filter: grayscale(1); opacity: .45; }
+.badge.locked b { color: var(--muted); }
+.badge.got { border-color: var(--good); }
+.insight { display: flex; gap: 12px; padding: 14px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--line); }
+.insight .ic { font-size: 24px; line-height: 1.2; }
+.insight b { display: block; }
+.insight p { margin: 4px 0 6px; font-size: 14px; }
+.insight small { color: var(--muted); }
+.insights { display: grid; gap: 10px; }
+.needs { padding: 12px 14px; border: 1px dashed var(--line); border-radius: var(--radius-md); color: var(--muted); font-size: 14px; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <h1>Hostel Desk</h1>
+    <div class="date" id="dateLabel"></div>
+  </div>
+  <div class="grow"></div>
+  <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark theme">🌓</button>
+  <button class="icon-btn" id="settingsBtn" aria-label="Open settings">⚙️</button>
+</header>
+
+<nav class="nav" id="nav" aria-label="Sections">
+  <button data-tab="today" aria-current="page"><span class="ico">🏠</span>Today</button>
+  <button data-tab="spend"><span class="ico">💸</span>Spend</button>
+  <button data-tab="body"><span class="ico">💧</span>Body</button>
+  <button data-tab="gym"><span class="ico">🏋️</span>Gym</button>
+  <button data-tab="mood"><span class="ico">🙂</span>Mood</button>
+  <button data-tab="lab"><span class="ico">🧪</span>Lab</button>
+</nav>
+
+<div class="cmd">
+  <form id="cmdForm" autocomplete="off">
+    <input type="text" id="cmdInput" maxlength="200" placeholder="Log: spent 120 on biryani" aria-label="Type what to log">
+    <button type="submit">Log</button>
+  </form>
+  <div class="hints" id="cmdHints">
+    <button type="button" data-hint="spent 120 on biryani">spent 120 on biryani</button>
+    <button type="button" data-hint="drank 2 glasses">drank 2 glasses</button>
+    <button type="button" data-hint="slept 7 hours">slept 7 hours</button>
+    <button type="button" data-hint="bench press 3x8 40kg">bench press 3x8 40kg</button>
+    <button type="button" data-hint="mood 4">mood 4</button>
+    <button type="button" data-hint="weight 65.5">weight 65.5</button>
+  </div>
+</div>
+
+<main>
+  <div id="loadError" class="empty" hidden></div>
+  <button class="nudge" id="backupNudge" type="button" hidden>Your data lives only on this phone. Tap to make a backup.</button>
+
+  <!-- TODAY -->
+  <section class="tab" id="tab-today">
+    <div class="hero" id="hero"></div>
+    <button class="scorecard" id="scoreCard" data-go="lab" aria-label="Open your score breakdown"></button>
+    <div class="strip" id="strip"></div>
+    <div>
+      <h2>Worth knowing</h2>
+      <ul class="tips" id="tips"></ul>
+      <p class="note">These tips come from simple rules on your own numbers. They are not medical or financial advice.</p>
+    </div>
+    <div>
+      <h2>How are you feeling?</h2>
+      <div class="moods" id="quickMoods">
+        <button data-mood="1" aria-label="Very low">😞</button>
+        <button data-mood="2" aria-label="Low">😕</button>
+        <button data-mood="3" aria-label="Okay">😐</button>
+        <button data-mood="4" aria-label="Good">🙂</button>
+        <button data-mood="5" aria-label="Great">😄</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPEND -->
+  <section class="tab" id="tab-spend" hidden>
+    <form class="form" id="expenseForm">
+      <h2>Add an expense</h2>
+      <div class="grid2">
+        <label class="field"><span>Amount (₹)</span><input type="number" id="exAmount" inputmode="decimal" min="0.01" step="any" required placeholder="120"></label>
+        <label class="field"><span>Date (blank is today)</span><input type="date" id="exDay"></label>
+      </div>
+      <div class="chips" id="exCats" role="radiogroup" aria-label="Category"></div>
+      <label class="field"><span>Note (optional)</span><input type="text" id="exNote" maxlength="200" placeholder="Biryani at the canteen"></label>
+      <button class="btn money" type="submit">Add expense</button>
+    </form>
+
+    <div class="panel">
+      <div class="row between"><h2>Last 14 days</h2><span class="sub" id="spendAvg"></span></div>
+      <div class="chart" id="spendChart" style="--c:var(--money-fill)"></div>
+    </div>
+
+    <div>
+      <h2>This month by category</h2>
+      <div class="cats" id="catBars"></div>
+      <p class="note" id="weekendNote"></p>
+    </div>
+
+    <div>
+      <h2>Recent expenses</h2>
+      <ul class="list" id="exList"></ul>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <section class="tab" id="tab-body" hidden>
+    <form class="form" id="healthForm">
+      <h2>Today's habits</h2>
+      <div class="field">
+        <span>Water (glasses)</span>
+        <div class="stepper"><button type="button" data-step="water" data-d="-1" aria-label="One less glass">−</button><input type="number" id="hWater" min="0" max="40" inputmode="numeric" placeholder="0"><button type="button" data-step="water" data-d="1" aria-label="One more glass">+</button></div>
+        <div class="glasses" id="glasses" aria-hidden="true"></div>
+      </div>
+      <div class="grid3">
+        <label class="field"><span>Sleep (hours)</span><input type="number" id="hSleep" min="0" max="24" step="0.25" inputmode="decimal" placeholder="7.5"></label>
+        <label class="field"><span>Meals</span><input type="number" id="hMeals" min="0" max="10" inputmode="numeric" placeholder="3"></label>
+        <label class="field"><span>Weight (kg)</span><input type="number" id="hWeight" min="20" max="300" step="0.1" inputmode="decimal" placeholder="65"></label>
+      </div>
+      <button class="btn body" type="submit">Save today</button>
+    </form>
+
+    <div class="facts" id="healthFacts"></div>
+
+    <div class="panel">
+      <h2>Sleep, last 14 days</h2>
+      <div class="chart" id="sleepChart" style="--c:var(--body-fill)"></div>
+    </div>
+    <div class="panel">
+      <h2>Water, last 14 days</h2>
+      <div class="chart" id="waterChart" style="--c:var(--body-fill)"></div>
+    </div>
+  </section>
+
+  <!-- GYM -->
+  <section class="tab" id="tab-gym" hidden>
+    <form class="form" id="gymForm">
+      <h2>Log an exercise</h2>
+      <label class="field"><span>Exercise</span><input type="text" id="gName" list="gNames" maxlength="60" required placeholder="Bench press" autocomplete="off"></label>
+      <datalist id="gNames"></datalist>
+      <div class="grid3">
+        <label class="field"><span>Sets</span><input type="number" id="gSets" min="1" max="30" inputmode="numeric" required placeholder="3"></label>
+        <label class="field"><span>Reps</span><input type="number" id="gReps" min="1" max="200" inputmode="numeric" required placeholder="8"></label>
+        <label class="field"><span>Weight (kg)</span><input type="number" id="gWeight" min="0" max="1000" step="0.5" inputmode="decimal" placeholder="0"></label>
+      </div>
+      <p class="sub" style="margin-top:-4px">Use 0 kg for bodyweight moves like pull-ups.</p>
+      <button class="btn gym" type="submit">Log exercise</button>
+    </form>
+
+    <div class="facts" id="gymFacts"></div>
+
+    <div class="panel">
+      <div class="row between"><h2>Weekly volume</h2><span class="sub">sets × reps × kg</span></div>
+      <div class="chart" id="volChart" style="--c:var(--gym-fill)"></div>
+    </div>
+
+    <div>
+      <h2>Your lifts</h2>
+      <div class="exlist" id="exercises"></div>
+    </div>
+    <div class="panel" id="progressPanel" hidden>
+      <div class="row between"><h2 id="progressTitle"></h2><span class="sub">estimated max kg, or reps</span></div>
+      <div class="chart" id="progressChart" style="--c:var(--gym-fill)"></div>
+    </div>
+
+    <div>
+      <h2>Recent workouts</h2>
+      <ul class="list" id="wList"></ul>
+    </div>
+  </section>
+
+  <!-- MOOD -->
+  <section class="tab" id="tab-mood" hidden>
+    <form class="form" id="moodForm">
+      <h2>Log a mood</h2>
+      <div class="moods" id="moodPick" role="radiogroup" aria-label="Mood">
+        <button type="button" data-pick="1" aria-label="Very low">😞</button>
+        <button type="button" data-pick="2" aria-label="Low">😕</button>
+        <button type="button" data-pick="3" aria-label="Okay">😐</button>
+        <button type="button" data-pick="4" aria-label="Good">🙂</button>
+        <button type="button" data-pick="5" aria-label="Great">😄</button>
+      </div>
+      <label class="field"><span>Note (optional)</span><input type="text" id="mNote" maxlength="200" placeholder="Exam went better than expected"></label>
+      <button class="btn mood" type="submit">Save mood</button>
+    </form>
+    <div class="facts" id="moodFacts"></div>
+    <div class="panel">
+      <h2>Last 14 days</h2>
+      <div class="chart" id="moodChart" style="--c:var(--mood-fill)"></div>
+    </div>
+    <div>
+      <h2>Recent moods</h2>
+      <ul class="list" id="mList"></ul>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section class="tab" id="tab-lab" hidden>
+    <div class="panel">
+      <div class="row between"><h2 id="labScoreTitle">Today's score</h2><span class="sub" id="labLevel"></span></div>
+      <div class="parts" id="labParts"></div>
+      <p class="note">Days you log nothing don't earn XP. Spending below your allowance scores full marks, so log what you spend.</p>
+    </div>
+    <div class="panel">
+      <h2>Score, last 14 days</h2>
+      <div class="chart" id="scoreChart" style="--c:var(--gym-fill)"></div>
+      <p class="note" id="labXp"></p>
+    </div>
+    <div>
+      <h2>Badges</h2>
+      <div class="badges" id="badges"></div>
+    </div>
+    <div>
+      <h2>What your numbers say</h2>
+      <div class="insights" id="insights"></div>
+      <p class="note" id="insightNote"></p>
+    </div>
+  </section>
+</main>
+
+<dialog id="settings">
+  <form method="dialog" id="settingsForm">
+    <h2>Settings</h2>
+    <div class="grid2">
+      <label class="field"><span>Monthly pocket money (₹)</span><input type="number" id="sBudget" min="1" step="any" inputmode="decimal"></label>
+      <label class="field"><span>Water goal (glasses)</span><input type="number" id="sWater" min="1" max="30" inputmode="numeric"></label>
+      <label class="field"><span>Sleep goal (hours)</span><input type="number" id="sSleep" min="3" max="12" step="0.25" inputmode="decimal"></label>
+      <label class="field"><span>Gym days per week</span><input type="number" id="sGym" min="1" max="7" inputmode="numeric"></label>
+    </div>
+    <div>
+      <h2>Category budgets (₹, blank for none)</h2>
+      <div class="catgrid" id="sCats"></div>
+    </div>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn ghost" type="button" id="exportBtn">Download backup</button>
+      <button class="btn ghost" type="button" id="importBtn">Restore from backup</button>
+      <button class="btn danger" type="button" id="resetBtn">Erase everything</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+    <p class="note" id="backupNote"></p>
+    <div class="row between">
+      <button class="btn ghost" type="button" id="settingsCancel">Cancel</button>
+      <button class="btn" type="submit" id="settingsSave">Save settings</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="engine.js"></script>
+<script>
+"use strict";
+/* Everything runs in this page: engine.js holds the logic and the data lives in this browser's storage. */
+let store = null;
+try { localStorage.setItem("__t", "1"); localStorage.removeItem("__t"); store = localStorage; } catch (_) {}
+const memStore = {};
+const ENGINE = HostelEngine.createEngine(store || { getItem: k => (k in memStore ? memStore[k] : null), setItem: (k, v) => { memStore[k] = v; } });
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (_) {}
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const inr = n => (n < 0 ? "-₹" : "₹") + Math.round(Math.abs(n)).toLocaleString("en-IN");
+const num = (n, d = 1) => (n == null ? "–" : Number(n).toFixed(d).replace(/\.0+$/, ""));
+const pdate = iso => new Date(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
+const shortDay = iso => pdate(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+const MOODS = ["", "😞", "😕", "😐", "🙂", "😄"];
+
+let S = { today: null, expenses: [], workouts: [], moods: [], meta: { categories: [] }, score: null, insights: null };
+let tab = "today", exCat = "Food", pickedMood = 0, selectedEx = null;
+
+/* ---------- API + feedback ---------- */
+async function api(path, opts = {}) {
+  const r = ENGINE.handle(opts.method || "GET", path, opts.body);
+  if (r.status >= 400) {
+    const d = r.data && r.data.detail;
+    throw new Error(typeof d === "string" ? d : "Something went wrong. Try again.");
+  }
+  return r.data;
+}
+let toastTimer;
+function toast(msg, kind = "") {
+  const t = $("#toast");
+  t.textContent = msg; t.className = "show " + kind;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (t.className = ""), kind === "pr" ? 4200 : 2400);
+}
+async function act(fn, okMsg) {
+  try { const r = await fn(); await load(); if (okMsg) toast(okMsg); return r; }
+  catch (e) { toast(e.message, "err"); }
+}
+
+/* ---------- loading ---------- */
+async function load() {
+  try {
+    const [today, expenses, workouts, moods, meta, score, insights] = await Promise.all([
+      api("/api/today"), api("/api/expenses"), api("/api/workouts"), api("/api/moods"), api("/api/meta"),
+      api("/api/score"), api("/api/insights"),
+    ]);
+    S = { today, expenses, workouts, moods, meta, score, insights };
+    $("#loadError").hidden = true;
+    render();
+    updateNudge();
+  } catch (e) {
+    const box = $("#loadError");
+    box.hidden = false;
+    box.textContent = "Couldn't load your data. Refresh the page. If it keeps happening, your browser may be blocking storage.";
+  }
+}
+
+/* ---------- charts (plain SVG, no libraries) ---------- */
+function chartWidth(host) { return Math.max(host.clientWidth || 320, 240); }
+function xLabels(items, W, pl, pr, n, iw, pre) {
+  const step = Math.ceil(n / 7);
+  let s = "";
+  items.forEach((it, i) => {
+    if ((n - 1 - i) % step === 0) s += `<text class="axis" x="${pl + i * iw + iw / 2}" y="${pre}" text-anchor="middle">${esc(it.label)}</text>`;
+  });
+  return s;
+}
+function barChart(host, items, o = {}) {
+  if (!items.length) { host.innerHTML = ""; return; }
+  const W = chartWidth(host), H = o.height || 150, pl = 4, pr = 4, pt = 16, pb = 22;
+  const n = items.length, iw = (W - pl - pr) / n, bw = Math.max(4, iw * 0.6);
+  const max = Math.max(...items.map(i => i.value || 0), o.goal || 0, 1) * 1.12;
+  const y = v => pt + (H - pt - pb) * (1 - v / max);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label || "Bar chart")}">`;
+  s += `<line class="grid" x1="${pl}" x2="${W - pr}" y1="${H - pb}" y2="${H - pb}"/>`;
+  if (o.goal) s += `<line class="goal" x1="${pl}" x2="${W - pr}" y1="${y(o.goal)}" y2="${y(o.goal)}"/>` + (o.goalLabel === "" ? "" : `<text class="axis" x="${W - pr}" y="${y(o.goal) - 4}" text-anchor="end">${esc(o.goalLabel || "goal")}</text>`);
+  items.forEach((it, i) => {
+    const v = it.value || 0, top = y(v), x = pl + i * iw + (iw - bw) / 2;
+    s += `<rect class="bar${it.current ? " cur" : ""}" x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(H - pb - top, 0).toFixed(1)}" rx="3"><title>${esc(it.tip || it.label + ": " + v)}</title></rect>`;
+  });
+  s += xLabels(items, W, pl, pr, n, iw, H - 6) + "</svg>";
+  host.innerHTML = s;
+}
+function lineChart(host, items, o = {}) {
+  const vals = items.map(i => i.value).filter(v => v != null);
+  if (!vals.length) { host.innerHTML = `<div class="empty">No data yet.</div>`; return; }
+  const W = chartWidth(host), H = o.height || 150, pl = 26, pr = 8, pt = 14, pb = 22;
+  let lo = o.min ?? Math.min(...vals), hi = o.max ?? Math.max(...vals);
+  if (o.goal != null) { lo = Math.min(lo, o.goal); hi = Math.max(hi, o.goal); }
+  if (o.min == null && o.max == null) { const span = hi - lo, pad = span ? span * 0.2 : Math.max(1, Math.abs(hi) * 0.1); lo -= pad; hi += pad; }
+  const n = items.length, iw = (W - pl - pr) / n;
+  const x = i => pl + i * iw + iw / 2, y = v => pt + (H - pt - pb) * (1 - (v - lo) / (hi - lo));
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label || "Line chart")}">`;
+  const ticks = o.ticks || [lo, hi];
+  ticks.forEach(t => { s += `<line class="grid" x1="${pl}" x2="${W - pr}" y1="${y(t)}" y2="${y(t)}"/><text class="axis" x="${pl - 5}" y="${y(t) + 3}" text-anchor="end">${num(t)}</text>`; });
+  if (o.goal != null) s += `<line class="goal" x1="${pl}" x2="${W - pr}" y1="${y(o.goal)}" y2="${y(o.goal)}"/><text class="axis" x="${W - pr}" y="${y(o.goal) - 4}" text-anchor="end">${esc(o.goalLabel || "goal")}</text>`;
+  let d = "", pen = false;
+  items.forEach((it, i) => {
+    if (it.value == null) { pen = false; return; }
+    d += `${pen ? "L" : "M"}${x(i).toFixed(1)} ${y(it.value).toFixed(1)} `; pen = true;
+  });
+  s += `<path class="line" d="${d}"/>`;
+  items.forEach((it, i) => { if (it.value != null) s += `<circle class="dot" cx="${x(i).toFixed(1)}" cy="${y(it.value).toFixed(1)}" r="3.5"><title>${esc(it.label)}: ${num(it.value, 2)}</title></circle>`; });
+  s += xLabels(items, W, pl, pr, n, iw, H - 6) + "</svg>";
+  host.innerHTML = s;
+}
+const dayTick = iso => String(+iso.slice(8, 10));
+
+/* ---------- renderers ---------- */
+function render() {
+  const t = S.today; if (!t) return;
+  $("#dateLabel").textContent = pdate(t.date).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
+  ({ today: renderToday, spend: renderSpend, body: renderBody, gym: renderGym, mood: renderMood, lab: renderLab })[tab]();
+}
+
+function renderToday() {
+  const t = S.today, e = t.expenses, h = t.health, g = t.gym;
+  const over = e.left <= 0, overDay = !over && e.today_left < 0;
+  let label, big, cls = "";
+  if (over) { label = "Pocket money used up. Over budget by"; big = inr(-e.left); cls = "over"; }
+  else if (overDay) { label = "Over today's allowance by"; big = inr(-e.today_left); cls = "over"; }
+  else { label = "You can still spend today"; big = inr(e.today_left); }
+  const used = Math.min(e.used_pct, 100), tick = Math.min(e.expected_by_now / e.budget * 100, 100);
+  const pace = { ok: "On track for the month.", fast: "Spending faster than your monthly pace.", over: "Over budget. Stick to must-haves." }[e.status];
+  $("#hero").innerHTML = `
+    <p class="label">${label}</p>
+    <div class="num ${cls}">${big}</div>
+    <p class="line">Daily allowance ${inr(e.daily_allowance)}, spent today ${inr(e.today_spent)}. ${e.days_left} day${e.days_left === 1 ? "" : "s"} left this month.</p>
+    <div class="rail" role="img" aria-label="${Math.round(e.used_pct)} percent of budget used"><div class="fill ${over ? "over" : ""}" style="width:${used}%"></div><div class="tick" style="left:calc(${tick}% - 1px)" title="Where you'd be if you spent evenly"></div></div>
+    <div class="rail-legend"><span>${inr(e.spent)} spent</span><span>${inr(e.budget)} budget</span></div>
+    <p class="pace">${pace} ${e.spent > 0 ? "At this pace: " + inr(e.projected) + " by month end." : ""}</p>`;
+
+  const sc = S.score;
+  const pts = sc.today ? sc.today.total : 0;
+  $("#scoreCard").innerHTML = `
+    <div class="big">${pts}<small>/100</small></div>
+    <div><span class="lv">Level ${sc.level}, ${esc(sc.level_name)}</span> <span class="sub">today's score${sc.today ? "" : ", nothing logged yet"}</span></div>
+    <div><div class="xp" role="img" aria-label="${sc.xp_into} of ${sc.xp_span} XP to next level"><i style="width:${Math.min(sc.xp_into / sc.xp_span * 100, 100)}%"></i></div><div class="xp-note">${sc.xp_into} / ${sc.xp_span} XP to level ${sc.level + 1}</div></div>`;
+
+  const w = h.today.water, sl = h.today.sleep;
+  $("#strip").innerHTML = `
+    <div><div class="k">Water</div><div class="v">${w ?? 0}/${h.water_goal}</div><button class="plus" data-act="water">+1 glass</button></div>
+    <button data-go="body"><div class="k">Sleep</div><div class="v">${sl != null ? num(sl) + " h" : "–"}</div><div class="s">${h.avg_sleep_7 != null ? "7-day avg " + num(h.avg_sleep_7) + " h" : "Not logged today"}</div></button>
+    <button data-go="gym"><div class="k">Gym this week</div><div class="v">${g.week_days}/${g.week_goal}</div><div class="s">${g.days_since_last == null ? "No workouts yet" : g.days_since_last === 0 ? "Trained today" : g.days_since_last + (g.days_since_last === 1 ? " day" : " days") + " since last"}</div></button>`;
+
+  $("#tips").innerHTML = t.tips.length
+    ? t.tips.map(x => `<li class="${x.kind}"><span class="ic" aria-hidden="true">${x.icon}</span><span>${esc(x.text)}</span></li>`).join("")
+    : `<li><span class="ic">✨</span><span>Nothing to flag. Log today's spending, water and sleep to get tips.</span></li>`;
+}
+
+function renderSpend() {
+  const e = S.today.expenses;
+  $("#exCats").innerHTML = S.meta.categories.map(c =>
+    `<label><input type="radio" name="excat" value="${esc(c)}" ${c === exCat ? "checked" : ""}><span>${esc(c)}</span></label>`).join("");
+  $("#exDay").max = S.today.date;
+  const items = e.last14.map((d, i) => ({ label: dayTick(d.day), value: d.total, current: i === 13, tip: `${shortDay(d.day)}: ${inr(d.total)}` }));
+  $("#spendAvg").textContent = `Average ${inr(items.reduce((a, b) => a + b.value, 0) / 14)} a day`;
+  barChart($("#spendChart"), items, { goal: e.daily_allowance, goalLabel: "daily allowance", label: "Daily spending, last 14 days" });
+
+  const rows = e.by_category;
+  $("#catBars").innerHTML = rows.length ? rows.map(c => {
+    const cap = Math.max(c.budget || 0, c.spent, 1), hot = c.pct != null && c.pct >= 80;
+    return `<div class="cat"><div class="top"><span>${esc(c.category)}</span><span>${inr(c.spent)}${c.budget ? " of " + inr(c.budget) : ""}</span></div>
+      <div class="bar"><i class="${hot ? "hot" : ""}" style="width:${c.spent / cap * 100}%"></i>${c.budget ? `<u style="left:${c.budget / cap * 100}%"></u>` : ""}</div></div>`;
+  }).join("") : `<div class="empty">Nothing spent this month yet. Add your first expense above.</div>`;
+  $("#weekendNote").textContent = e.weekday_avg + e.weekend_avg > 0
+    ? `Last 4 weeks: ${inr(e.weekday_avg)} a day on weekdays, ${inr(e.weekend_avg)} a day on weekends.` : "";
+
+  const month = S.today.date.slice(0, 7);
+  const list = S.expenses.filter(x => x.day.startsWith(month)).slice(0, 40);
+  $("#exList").innerHTML = list.length ? list.map(x => `
+    <li><div class="main"><b>${esc(x.note || x.category)}</b><small>${esc(x.category)}, ${shortDay(x.day)}</small></div>
+    <span class="amt">${inr(x.amount)}</span><button class="del" data-del="expenses" data-id="${x.id}" aria-label="Delete this expense">🗑️</button></li>`).join("")
+    : `<li class="empty" style="display:block;border:1px dashed var(--line)">No expenses this month yet.</li>`;
+}
+
+function renderBody() {
+  const h = S.today.health, t = h.today;
+  const set = (id, v) => { const el = $(id); if (document.activeElement !== el) el.value = v ?? ""; };
+  set("#hWater", t.water); set("#hSleep", t.sleep); set("#hMeals", t.meals); set("#hWeight", t.weight);
+  paintGlasses();
+  $("#healthFacts").innerHTML = [
+    [h.avg_sleep_7 != null ? num(h.avg_sleep_7) + " h" : "–", "average sleep, 7 days"],
+    [h.sleep_spread != null ? "±" + num(h.sleep_spread) + " h" : "–", "sleep swing"],
+    [h.water_streak + " day" + (h.water_streak === 1 ? "" : "s"), "water goal streak"],
+    [h.latest_weight != null ? num(h.latest_weight) + " kg" : "–", h.weight_change_30 != null ? (h.weight_change_30 > 0 ? "+" : "") + num(h.weight_change_30) + " kg in 30 days" : "latest weight"],
+  ].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
+  lineChart($("#sleepChart"), h.last14.map(d => ({ label: dayTick(d.day), value: d.sleep })), { goal: h.sleep_goal, goalLabel: "goal", min: 0, max: 12, ticks: [0, 6, 12], label: "Sleep hours, last 14 days" });
+  barChart($("#waterChart"), h.last14.map((d, i) => ({ label: dayTick(d.day), value: d.water || 0, current: i === 13, tip: `${shortDay(d.day)}: ${d.water ?? 0} glasses` })), { goal: h.water_goal, goalLabel: "goal", label: "Water glasses, last 14 days" });
+}
+function paintGlasses() {
+  const goal = S.today.health.water_goal, n = +$("#hWater").value || 0;
+  $("#glasses").innerHTML = Array.from({ length: Math.max(goal, n) }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("");
+}
+
+function renderGym() {
+  const g = S.today.gym;
+  $("#gNames").innerHTML = g.exercises.map(x => `<option value="${esc(x.exercise)}">`).join("");
+  $("#gymFacts").innerHTML = [
+    [`${g.week_days}/${g.week_goal}`, "workout days this week"],
+    [g.day_streak + " day" + (g.day_streak === 1 ? "" : "s"), "workout streak"],
+    [g.total_sessions, "total sessions"],
+  ].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
+  barChart($("#volChart"), g.weekly.map((w, i) => ({ label: shortDay(w.week), value: w.volume, current: i === g.weekly.length - 1, tip: `Week of ${shortDay(w.week)}: ${Math.round(w.volume).toLocaleString("en-IN")} kg, ${w.days} day(s)` })), { label: "Weekly training volume" });
+
+  if (!selectedEx && g.exercises.length) selectedEx = g.exercises[0].exercise;
+  $("#exercises").innerHTML = g.exercises.length ? g.exercises.map(x => `
+    <button class="ex" data-ex="${esc(x.exercise)}" aria-pressed="${x.exercise === selectedEx}">
+      <b>${esc(x.exercise)}</b>
+      <small>Best ${x.best_weight ? num(x.best_weight, 1) + " kg" : "bodyweight"}${x.best_weight ? ", estimated max " + num(x.best_score) + " kg" : ""}</small>
+      <small>${x.sessions} session${x.sessions === 1 ? "" : "s"}, last ${x.last_reps} reps ${x.last_weight ? "at " + num(x.last_weight) + " kg" : ""} on ${shortDay(x.last_day)}</small>
+    </button>`).join("") : `<div class="empty">No exercises yet. Log your first one above and progress charts appear here.</div>`;
+  loadProgress();
+
+  const list = S.workouts.slice(0, 30);
+  $("#wList").innerHTML = list.length ? list.map(w => `
+    <li><div class="main"><b>${esc(w.exercise)}</b><small>${w.sets} × ${w.reps}${w.weight ? " at " + num(w.weight) + " kg" : ", bodyweight"}, ${shortDay(w.day)}</small></div>
+    <button class="del" data-del="workouts" data-id="${w.id}" aria-label="Delete this workout">🗑️</button></li>`).join("")
+    : `<li class="empty" style="display:block;border:1px dashed var(--line)">No workouts yet.</li>`;
+}
+async function loadProgress() {
+  const panel = $("#progressPanel");
+  if (!selectedEx) { panel.hidden = true; return; }
+  try {
+    const pts = await api("/api/workouts/progress?exercise=" + encodeURIComponent(selectedEx));
+    panel.hidden = false;
+    $("#progressTitle").textContent = selectedEx;
+    lineChart($("#progressChart"), pts.map(p => ({ label: shortDay(p.day).split(" ")[0], value: p.best_score })), { label: "Progress for " + selectedEx });
+  } catch (_) { panel.hidden = true; }
+}
+
+function renderMood() {
+  const m = S.today.mood;
+  $$("#moodPick button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.pick === pickedMood)));
+  $$("#moodPick button").forEach(b => (b.style.boxShadow = +b.dataset.pick === pickedMood ? "0 0 0 3px var(--mood) inset" : ""));
+  $("#moodFacts").innerHTML = [
+    [m.today_avg != null ? MOODS[Math.round(m.today_avg)] + " " + num(m.today_avg, 1) : "–", "today's average"],
+    [m.streak + " day" + (m.streak === 1 ? "" : "s"), "logging streak"],
+    [m.recent_avg != null ? num(m.recent_avg, 1) + " / 5" : "–", "last 5 entries"],
+  ].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
+  lineChart($("#moodChart"), m.last14.map(d => ({ label: dayTick(d.day), value: d.avg })), { min: 1, max: 5, ticks: [1, 3, 5], label: "Daily mood average, last 14 days" });
+  const list = S.moods.slice(0, 30);
+  $("#mList").innerHTML = list.length ? list.map(x => `
+    <li><span style="font-size:26px">${MOODS[x.score]}</span><div class="main"><b>${esc(x.note || "No note")}</b><small>${shortDay(x.day)}, ${new Date(x.ts).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}</small></div>
+    <button class="del" data-del="moods" data-id="${x.id}" aria-label="Delete this mood">🗑️</button></li>`).join("")
+    : `<li class="empty" style="display:block;border:1px dashed var(--line)">No moods logged yet.</li>`;
+}
+
+function renderLab() {
+  const sc = S.score, ins = S.insights;
+  $("#labLevel").textContent = `Level ${sc.level}, ${sc.level_name}`;
+  $("#labScoreTitle").textContent = sc.today ? `Today's score: ${sc.today.total}/100` : "Today's score: nothing logged yet";
+  const parts = sc.today ? sc.today.parts : [];
+  $("#labParts").innerHTML = parts.length ? parts.map(p => `
+    <div class="part"><div class="top"><span>${esc(p.label)} <small>${esc(p.hint)}</small></span><b>${num(p.points)}/${p.max}</b></div>
+    <div class="bar"><i style="width:${p.points / p.max * 100}%"></i></div></div>`).join("")
+    : `<div class="empty">Log anything today and your score shows up here.</div>`;
+  $("#labXp").textContent = `Dashed line marks 70. ${sc.xp} XP total from ${sc.active_days} active day${sc.active_days === 1 ? "" : "s"}.`;
+  barChart($("#scoreChart"), sc.history.map((d, i) => ({ label: dayTick(d.day), value: d.score || 0, current: i === sc.history.length - 1, tip: `${shortDay(d.day)}: ${d.score == null ? "nothing logged" : d.score + "/100"}` })), { goal: 70, goalLabel: "", label: "Daily score, last 14 days" });
+  $("#badges").innerHTML = sc.badges.map(b => `
+    <div class="badge ${b.unlocked ? "got" : "locked"}"><span class="ic" aria-hidden="true">${b.icon}</span><b>${esc(b.name)}</b><small>${esc(b.desc)}</small><small>${b.unlocked ? "Unlocked" : esc(b.progress)}</small></div>`).join("");
+  $("#insights").innerHTML = ins.insights.map(i => `
+    <div class="insight"><span class="ic" aria-hidden="true">${i.icon}</span><div><b>${esc(i.title)}</b><p>${esc(i.detail)}</p><small>${esc(i.strength)}, from ${i.n} days</small></div></div>`).join("")
+    + ins.needs.map(n => `<div class="needs">${esc(n)}</div>`).join("");
+  $("#insightNote").textContent = ins.note + (ins.days_considered ? ` Looked at ${ins.days_considered} logged days from the last 60.` : "");
+}
+
+/* ---------- navigation ---------- */
+function showTab(name) {
+  tab = name;
+  $$(".tab").forEach(s => (s.hidden = s.id !== "tab-" + name));
+  $$("#nav button").forEach(b => {
+    if (b.dataset.tab === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+  });
+  if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
+  window.scrollTo(0, 0);
+  render();
+}
+$("#nav").addEventListener("click", e => { const b = e.target.closest("button[data-tab]"); if (b) showTab(b.dataset.tab); });
+
+/* ---------- events ---------- */
+document.addEventListener("click", async e => {
+  const go = e.target.closest("[data-go]"); if (go) return showTab(go.dataset.go);
+  const del = e.target.closest("[data-del]");
+  if (del) { if (confirm("Delete this entry?")) act(() => api(`/api/${del.dataset.del}/${del.dataset.id}`, { method: "DELETE" }), "Deleted"); return; }
+  const water = e.target.closest('[data-act="water"]');
+  if (water) { const w = (S.today.health.today.water || 0) + 1; return act(() => api("/api/health", { method: "PUT", body: { water: w } }), `Water: ${w} glass${w === 1 ? "" : "es"}`); }
+  const qm = e.target.closest("#quickMoods button");
+  if (qm) return act(() => api("/api/moods", { method: "POST", body: { score: +qm.dataset.mood } }), "Mood saved " + MOODS[+qm.dataset.mood]);
+  const pick = e.target.closest("#moodPick button");
+  if (pick) { pickedMood = +pick.dataset.pick; return renderMood(); }
+  const ex = e.target.closest("[data-ex]");
+  if (ex) { selectedEx = ex.dataset.ex; return renderGym(); }
+  const step = e.target.closest("[data-step]");
+  if (step) { const el = $("#hWater"); el.value = Math.max(0, (+el.value || 0) + +step.dataset.d); paintGlasses(); }
+});
+$("#exCats").addEventListener("change", e => { if (e.target.name === "excat") exCat = e.target.value; });
+$("#hWater").addEventListener("input", paintGlasses);
+
+$("#expenseForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const body = { amount: +$("#exAmount").value, category: exCat, note: $("#exNote").value };
+  if ($("#exDay").value) body.day = $("#exDay").value;
+  const ok = await act(() => api("/api/expenses", { method: "POST", body }), `Added ${inr(body.amount)} for ${exCat}`);
+  if (ok) { $("#exAmount").value = ""; $("#exNote").value = ""; $("#exDay").value = ""; $("#exAmount").focus(); }
+});
+$("#healthForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const body = {};
+  [["water", "#hWater"], ["sleep", "#hSleep"], ["meals", "#hMeals"], ["weight", "#hWeight"]].forEach(([k, id]) => { const v = $(id).value; if (v !== "") body[k] = +v; });
+  if (!Object.keys(body).length) return toast("Enter at least one value to save.", "err");
+  act(() => api("/api/health", { method: "PUT", body }), "Saved today's habits");
+});
+$("#gymForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const body = { exercise: $("#gName").value, sets: +$("#gSets").value, reps: +$("#gReps").value, weight: +$("#gWeight").value || 0 };
+  const r = await act(() => api("/api/workouts", { method: "POST", body }));
+  if (!r) return;
+  selectedEx = r.exercise;
+  if (r.is_pr) toast(`New personal best on ${r.exercise}! 🎉`, "pr");
+  else if (r.first) toast(`First ${r.exercise} logged. This is your baseline.`);
+  else toast("Exercise logged");
+  $("#gSets").value = ""; $("#gReps").value = ""; $("#gWeight").value = ""; $("#gName").value = "";
+  renderGym();
+});
+$("#moodForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!pickedMood) return toast("Pick how you feel first.", "err");
+  const ok = await act(() => api("/api/moods", { method: "POST", body: { score: pickedMood, note: $("#mNote").value } }), "Mood saved " + MOODS[pickedMood]);
+  if (ok) { pickedMood = 0; $("#mNote").value = ""; renderMood(); }
+});
+
+
+$("#cmdForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const input = $("#cmdInput"), text = input.value.trim();
+  if (!text) return;
+  const r = await act(() => api("/api/command", { method: "POST", body: { text } }));
+  if (!r) return;                                   // act() already showed the error
+  input.value = "";
+  toast(r.summary, r.is_pr ? "pr" : "");
+});
+$("#cmdHints").addEventListener("click", e => {
+  const b = e.target.closest("[data-hint]"); if (!b) return;
+  const i = $("#cmdInput"); i.value = b.dataset.hint; i.focus();
+});
+
+/* ---------- settings, theme ---------- */
+const dlg = $("#settings");
+$("#settingsBtn").addEventListener("click", () => {
+  const s = S.today ? S.today.settings : null; if (!s) return;
+  $("#sBudget").value = s.monthly_budget; $("#sWater").value = s.water_goal; $("#sSleep").value = s.sleep_goal; $("#sGym").value = s.gym_goal;
+  $("#sCats").innerHTML = S.meta.categories.map(c => `<label>${esc(c)}<input type="number" min="0" step="any" inputmode="decimal" data-cat="${esc(c)}" value="${s.category_budgets[c] ?? ""}"></label>`).join("");
+  updateBackupNote();
+  dlg.showModal();
+});
+$("#settingsCancel").addEventListener("click", () => dlg.close());
+$("#settingsForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const cb = {}; $$("#sCats input").forEach(i => { cb[i.dataset.cat] = i.value === "" ? 0 : +i.value; });
+  const body = { monthly_budget: +$("#sBudget").value, water_goal: +$("#sWater").value, sleep_goal: +$("#sSleep").value, gym_goal: +$("#sGym").value, category_budgets: cb };
+  const ok = await act(() => api("/api/settings", { method: "PUT", body }), "Settings saved");
+  if (ok) dlg.close();
+});
+$("#exportBtn").addEventListener("click", async () => {
+  try {
+    const data = await api("/api/export");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+    a.download = "hostel-desk-" + S.today.date + ".json"; a.click(); URL.revokeObjectURL(a.href);
+    toast("Backup downloaded"); updateBackupNote(); updateNudge();
+  } catch (e) { toast(e.message, "err"); }
+});
+$("#importBtn").addEventListener("click", () => $("#importFile").click());
+$("#importFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  let data;
+  try { data = JSON.parse(await f.text()); } catch (_) { return toast("That file isn't a Hostel Desk backup.", "err"); }
+  if (!confirm("Restore from this file? It replaces everything currently on this phone.")) return;
+  const r = await act(() => api("/api/import", { method: "POST", body: data }));
+  if (r) { selectedEx = null; dlg.close(); toast(`Restored ${r.expenses} expenses, ${r.workouts} workouts, ${r.moods} moods and ${r.health} days of habits`); }
+});
+function backupAgeDays() {
+  const b = ENGINE.backupAge();
+  return b ? Math.round((pdate(S.today.date) - pdate(b)) / 86400000) : null;
+}
+function updateBackupNote() {
+  const b = ENGINE.backupAge(), age = S.today ? backupAgeDays() : null;
+  $("#backupNote").textContent = "Your data is stored only on this phone, in this browser. " +
+    (b ? `Last backup: ${age === 0 ? "today" : age === 1 ? "yesterday" : age + " days ago"}. ` : "No backup yet. ") +
+    "To move it to another device, download a backup there and restore it here." +
+    (store ? "" : " Your browser is blocking storage, so nothing will be saved after you close this page.");
+}
+function updateNudge() {
+  const age = backupAgeDays(), n = ENGINE.entryCount();
+  $("#backupNudge").hidden = !(n >= 10 && (age === null || age > 14));
+}
+$("#backupNudge").addEventListener("click", () => $("#settingsBtn").click());
+$("#resetBtn").addEventListener("click", async () => {
+  if (prompt("This deletes ALL your data and settings. Type DELETE to confirm.") !== "DELETE") return;
+  const ok = await act(() => api("/api/reset-all", { method: "DELETE" }), "Everything erased");
+  if (ok) { selectedEx = null; dlg.close(); }
+});
+function applyTheme(t) { document.documentElement.dataset.theme = t; $('meta[name="theme-color"]').content = t === "dark" ? "#0D1322" : "#14213D"; }
+(function () { let t = null; try { t = localStorage.getItem("theme"); } catch (_) {} applyTheme(t || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")); })();
+$("#themeBtn").addEventListener("click", () => {
+  const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  applyTheme(t); try { localStorage.setItem("theme", t); } catch (_) {}
+});
+
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => S.today && render(), 150); });
+const start = location.hash.slice(1);
+if (["today", "spend", "body", "gym", "mood", "lab"].includes(start)) tab = start;
+showTab(tab);
+load();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
