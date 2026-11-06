@@ -1,6 +1,6 @@
 /* Service worker: keeps the app files on the phone so Hostel Desk opens with no internet.
  * Your data is NOT in this cache. It lives in localStorage. Bump VERSION when you change the app files. */
-const VERSION = "hostel-desk-v2";
+const VERSION = "hostel-desk-v3";
 const SHELL = ["./", "index.html", "engine.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", e => {

@@ -795,5 +795,28 @@
     return { amount, payee: pm ? pm[1] : null, incoming };
   }
 
-  return { createEngine, ValueError, parseBankSms, util: { pyRound, fmtFixed, fmtG } };
+  /* The greeting and "today's focus" at the top of the Today screen, built from the /api/today data. */
+  function indianGrouping(n) {
+    const s = String(Math.round(Math.abs(n)));
+    return s.length > 3 ? s.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ",") + "," + s.slice(-3) : s;
+  }
+  function greeting(t, hour) {
+    const title = hour >= 5 && hour < 12 ? "Good morning" : hour >= 12 && hour < 17 ? "Good afternoon" : hour >= 17 && hour < 22 ? "Good evening" : "Late night";
+    const e = t.expenses, h = t.health, g = t.gym, inr = n => "₹" + indianGrouping(n);
+    const parts = [];
+    if (e.left <= 0) parts.push("pocket money used up");
+    else if (e.today_left < 0) parts.push(`over today's allowance by ${inr(e.today_left)}`);
+    else parts.push(`${inr(e.today_left)} left today`);
+    const w = h.today.water || 0;
+    if (w < h.water_goal) { const n = h.water_goal - w; parts.push(`${n} glass${n === 1 ? "" : "es"} of water to go`); }
+    if (g.total_sessions === 0) parts.push("no workouts logged yet");
+    else if (g.week_days >= g.week_goal) parts.push("weekly gym goal done");
+    else { const n = g.week_goal - g.week_days; parts.push(`${n} more workout${n === 1 ? "" : "s"} this week`); }
+    if (t.mood.today_count === 0) parts.push("mood not logged yet");
+    const line = parts.slice(0, 3).join(", ");
+    const focus = t.tips.length ? t.tips[0] : { kind: "info", icon: "✨", text: "Nothing to flag. Log today's spending, water and sleep to get tips." };
+    return { title, line: line[0].toUpperCase() + line.slice(1) + ".", focus };
+  }
+
+  return { createEngine, ValueError, parseBankSms, greeting, util: { pyRound, fmtFixed, fmtG } };
 });

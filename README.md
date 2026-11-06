@@ -62,7 +62,7 @@ A **Log a payment** shortcut also appears when you long-press the home-screen ic
 
 ## Updating the app later
 
-Replace the files in the repo. In `sw.js` change `VERSION` (for example `hostel-desk-v3`) so phones
+Replace the files in the repo. In `sw.js` change `VERSION` (for example `hostel-desk-v4`) so phones
 fetch the new files. They show up the second time you open the app.
 
 ## Files
