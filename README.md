@@ -39,9 +39,30 @@ python -m http.server 8000
 Open http://127.0.0.1:8000. (Opening index.html by double-click won't work, because offline mode
 needs a web address.)
 
+## Auto-log UPI payments (Android)
+
+Google Pay doesn't share your payments with other apps, but your bank texts you for each one. A free
+automation app can react to that text and open Hostel Desk with the amount already filled in.
+
+1. Install **MacroDroid** from the Play Store and allow the permissions it asks for (SMS, notifications).
+2. Add a macro. **Trigger:** SMS Received, with the message containing `debited`.
+3. **Action:** Open Website / URL, using this address (put your own address first, and the magic text
+   `[sms_message]` at the end):
+
+   `https://YOUR-USERNAME.github.io/hostel-desk/?sms=[sms_message]`
+
+4. Save the macro and pay something small to test. Hostel Desk opens with `spent 75 on` in the log bar and a
+   line saying how much was paid and to which UPI id. Type the reason and tap Log.
+
+Notes: it only works for payments your bank sends an SMS for. Messages about money coming in are ignored.
+If an SMS contains a `#` or `&` the link may be cut off. The amount is almost always first in the text, so it
+still works. Otherwise type the amount yourself. You can also use `?amount=120` instead of `?sms=...`.
+
+A **Log a payment** shortcut also appears when you long-press the home-screen icon on Android.
+
 ## Updating the app later
 
-Replace the files in the repo. In `sw.js` change `VERSION` (for example `hostel-desk-v2`) so phones
+Replace the files in the repo. In `sw.js` change `VERSION` (for example `hostel-desk-v3`) so phones
 fetch the new files. They show up the second time you open the app.
 
 ## Files

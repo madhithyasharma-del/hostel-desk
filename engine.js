@@ -783,5 +783,17 @@
     };
   }
 
-  return { createEngine, ValueError, util: { pyRound, fmtFixed, fmtG } };
+  /* Pull the amount (and the UPI id, if the bank prints one) out of a bank debit SMS. */
+  function parseBankSms(text) {
+    const s = String(text || "");
+    const am = /(?:rs\.?|inr|₹)\s*([0-9][0-9,]*(?:\.\d{1,2})?)/i.exec(s);
+    if (!am) return null;
+    const amount = parseFloat(am[1].replace(/,/g, ""));
+    if (!(amount > 0 && amount <= 10000000)) return null;
+    const incoming = /\b(credited|received|deposited)\b/i.test(s) && !/\b(debited|debit|sent|paid|spent|withdrawn)\b/i.test(s);
+    const pm = /\bto\s+(?:vpa\s+)?([A-Za-z0-9._-]{2,40}@[A-Za-z0-9.-]{2,20})/i.exec(s);
+    return { amount, payee: pm ? pm[1] : null, incoming };
+  }
+
+  return { createEngine, ValueError, parseBankSms, util: { pyRound, fmtFixed, fmtG } };
 });
